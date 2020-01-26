@@ -1,9 +1,9 @@
 import React from "react";
 
-class SingIn extends React.Component {
+class SignIn extends React.Component {
   render() {
     return <div>Sign in</div>;
   }
 }
 
-export default SingIn;
+export default SignIn;
