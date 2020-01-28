@@ -13,13 +13,13 @@ const NavBar = () => (
     padding={1}
     shape="roundedBottom"
   >
-    <NavLink to="/signin">
+    <NavLink activeClassName="active" to="/signin">
       <Text size="xl" color="white">
         Sign In
       </Text>
     </NavLink>
 
-    <NavLink to="/">
+    <NavLink exact to="/">
       <Box display="flex" alignItems="center">
         <Box margin={2} height={50} width={50}>
           <Image
@@ -35,7 +35,7 @@ const NavBar = () => (
       </Box>
     </NavLink>
 
-    <NavLink to="/signup">
+    <NavLink activeClassName="active" to="/signup">
       <Text size="xl" color="white">
         Sign Up
       </Text>
