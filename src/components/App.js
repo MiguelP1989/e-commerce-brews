@@ -7,9 +7,12 @@ import {
   Card,
   Image,
   Text,
-  SearchField
+  SearchField,
+  Icon,
+  Spinner
 } from "gestalt";
 import "./App.css";
+import Loader from "./loader";
 
 // requestes for all the data
 import Strapi from "strapi-sdk-javascript/build/main";
@@ -19,9 +22,9 @@ const strapi = new Strapi(apiUrl);
 class App extends Component {
   state = {
     brands: [],
-    serachTerm: ""
+    searchTerm: "",
+    loadingBrand: true
   };
-
   async componentDidMount() {
     try {
       const response = await strapi.request("POST", "/graphql", {
@@ -40,35 +43,53 @@ class App extends Component {
       });
       console.log(response);
 
-      this.setState({ brands: response.data.brands });
+      this.setState({ brands: response.data.brands, loadingBrand: false });
     } catch (err) {
       console.log(err);
+      this.setState({ loadingBrand: false });
     }
-
-    // handleChange(e) {
-    //     console.log(e);
-    // }
   }
+
+  handleChange = e => {
+    console.log(e.value);
+    this.setState({
+      searchTerm: e.value
+    });
+  };
+
   render() {
+    const { brands, searchTerm, loadingBrand } = this.state;
     return (
       <Container>
         <Box display="flex" justifyContent="center" marginTop={4}>
           <SearchField
             id="serachfield"
-            accessibilityLabels="Brands search Field"
+            accessibilityLabel="Brands search Field"
+            value={searchTerm}
+            onChange={this.handleChange}
             placeholder="serach Brands"
           />
+          <Box margin={2}>
+            <Icon
+              accessibilityLabel="filter"
+              icon="filter"
+              color={searchTerm ? "orange" : "gray"}
+              size={20}
+            />
+          </Box>
         </Box>
-        <Box display="flex" justifyContent="center" marginBottom={2}>
+        <Box display="flex" justifyContent="center" marginBottom={2} size={20}>
           <Heading color="midnight" size="md">
             Brew Brands
           </Heading>
         </Box>
+
         <Box wrap display="flex" justifyContent="around">
-          {this.state.brands.map(brand => {
+          {brands.map(brand => {
             return (
               <Box margin={3} height={350} width={200} key={brand._id}>
                 <Card
+                  margin={4}
                   image={
                     <Box height={200} width={200}>
                       <Image
@@ -99,6 +120,7 @@ class App extends Component {
             );
           })}
         </Box>
+        {loadingBrand && <Loader />}
       </Container>
     );
   }
