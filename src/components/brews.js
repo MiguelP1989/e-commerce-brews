@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import {
   Container,
@@ -7,10 +8,9 @@ import {
   Card,
   Image,
   Text,
-  SearchField,
-  Icon,
-  Spinner,
-  Button
+  Button,
+  Mask,
+  IconButton
 } from "gestalt";
 
 import Strapi from "strapi-sdk-javascript/build/main";
@@ -21,7 +21,8 @@ const strapi = new Strapi(apiUrl);
 class Brews extends React.Component {
   state = {
     brews: [],
-    brand: ""
+    brand: "",
+    cartItems: []
   };
   async componentDidMount() {
     let brandId = this.props.match.params.brandid;
@@ -56,14 +57,36 @@ class Brews extends React.Component {
     }
   }
 
+  addToCart = brew => {
+    const alreadyInCart = this.state.cartItems.findIndex(
+      item => item._id === brew._id
+    );
+
+    if (alreadyInCart === -1) {
+      const updatedItems = this.state.cartItems.concat({
+        ...brew,
+        quantity: 1
+      });
+      this.setState({
+        cartItems: updatedItems
+      });
+    } else {
+      const updatedItems = [...this.state.cartItems];
+      updatedItems[alreadyInCart].quantity += 1;
+      this.setState({
+        cartItems: updatedItems
+      });
+    }
+  };
   render() {
-    const { brand, brews } = this.state;
+    const { brand, brews, cartItems } = this.state;
     return (
       <Box
         marginTop={4}
         display="flex"
         alignItems="start"
         justifyContent="center"
+        wrap
       >
         <Box display="flex" direction="column" alignItems="center">
           <Box margin={2}>
@@ -77,7 +100,7 @@ class Brews extends React.Component {
             >
               {brews.map(brew => {
                 return (
-                  <Box margin={3} height={350} width={200} key={brew._id}>
+                  <Box margin={3} height={420} width={200} key={brew._id}>
                     <Card
                       margin={4}
                       image={
@@ -106,7 +129,11 @@ class Brews extends React.Component {
                             <Text color="orchid">{brew.price}£</Text>
                             <Box marginTop={2}>
                               <Text bold size="xl">
-                                <Button color="blue" text="Add to cart" />
+                                <Button
+                                  onClick={() => this.addToCart(brew)}
+                                  color="blue"
+                                  text="Add to cart"
+                                />
                               </Text>
                             </Box>
                           </Box>
@@ -118,6 +145,53 @@ class Brews extends React.Component {
               })}
             </Box>
           </Box>
+        </Box>
+        <Box marginTop={2} marginLeft={8}>
+          <Mask shape="rounded" wash>
+            <Box
+              display="flex"
+              direction="column"
+              alignItems="center"
+              padding={2}
+            >
+              <Heading align="center" size="md">
+                Your Cart
+              </Heading>
+              <Text color="gray" italic>
+                {cartItems.length} itemns selected
+              </Text>
+              {cartItems.map(item => (
+                <Box key={item._id} display="flex" alignItems="center">
+                  <Text>
+                    {item.name} * {item.quantity} - £
+                    {(item.quantity * item.price).toFixed(2)}
+                  </Text>
+                  <IconButton
+                    accessibilityLabel="Delete Item"
+                    icon="cancel"
+                    size="sm"
+                    iconColor="red"
+                  />
+                </Box>
+              ))}
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                direction="column"
+              >
+                <Box margin={2}>
+                  {cartItems.length === 0 && (
+                    <Text color="red">Please select some items</Text>
+                  )}
+                </Box>
+                <Text size="lg">Total: </Text>
+                <Text>
+                  <Link to="/checkout">Check Out</Link>
+                </Text>
+              </Box>
+            </Box>
+          </Mask>
         </Box>
       </Box>
     );
