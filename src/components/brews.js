@@ -12,6 +12,8 @@ import {
   Mask,
   IconButton
 } from "gestalt";
+import Loader from "./loader";
+import { calculatePrice } from "../utils";
 
 import Strapi from "strapi-sdk-javascript/build/main";
 const apiUrl = process.env.API_URL || "http://localhost:1337";
@@ -22,7 +24,8 @@ class Brews extends React.Component {
   state = {
     brews: [],
     brand: "",
-    cartItems: []
+    cartItems: [],
+    loadingBrews: true
   };
   async componentDidMount() {
     let brandId = this.props.match.params.brandid;
@@ -50,10 +53,12 @@ class Brews extends React.Component {
       console.log(response);
       this.setState({
         brews: response.data.brand.brews,
-        brand: response.data.brand.name
+        brand: response.data.brand.name,
+        loadingBrews: false
       });
     } catch (err) {
       console.log(err);
+      this.setState({ loadingBrews: false });
     }
   }
 
@@ -90,7 +95,7 @@ class Brews extends React.Component {
   };
 
   render() {
-    const { brand, brews, cartItems } = this.state;
+    const { brand, brews, cartItems, loadingBrews } = this.state;
     return (
       <Box
         marginTop={4}
@@ -156,6 +161,7 @@ class Brews extends React.Component {
               })}
             </Box>
           </Box>
+          {loadingBrews && <Loader />}
         </Box>
         <Box marginTop={2} marginLeft={8}>
           <Mask shape="rounded" wash>
@@ -197,7 +203,7 @@ class Brews extends React.Component {
                     <Text color="red">Please select some items</Text>
                   )}
                 </Box>
-                <Text size="lg">Total: </Text>
+                <Text size="lg">Total: ${calculatePrice(cartItems)}</Text>
                 <Text>
                   <Link to="/checkout">Check Out</Link>
                 </Text>
