@@ -2,9 +2,11 @@ import React from "react";
 
 import { Container, Box, Heading, Text, Button, TextField } from "gestalt";
 import ToastMessage from "./toastmessage";
+import { getCart, calculatePrice } from "../utils";
 
 class CheckOut extends React.Component {
   state = {
+    cartItems: [],
     address: "",
     postalCode: "",
     city: "",
@@ -12,6 +14,12 @@ class CheckOut extends React.Component {
     toast: false,
     toastMessage: ""
   };
+
+  componentDidMount() {
+    console.log("mounting");
+    this.setState({ cartItems: getCart() });
+    console.log(this.state.cartItems);
+  }
 
   handleChange = ({ event, value }) => {
     event.persist();
@@ -37,7 +45,7 @@ class CheckOut extends React.Component {
   };
 
   render() {
-    const { toast, toastMessage } = this.state;
+    const { toast, toastMessage, cartItems } = this.state;
     return (
       <Container>
         <Box
@@ -47,7 +55,33 @@ class CheckOut extends React.Component {
           shape="rounded"
           display="flex"
           justifyContent="center"
+          alignItems="center"
+          direction="column"
         >
+          <Heading color="midnight">Checkout</Heading>
+          <Box
+            marginTop={2}
+            marginBottom={6}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            direction="column"
+          >
+            <Text color="darkGray">{cartItems.length} items for checkout</Text>
+            <Box padding={2}>
+              {cartItems.map(item => {
+                return (
+                  <Box key={item._id} padding={1}>
+                    <Text color="blue">
+                      {item.name} x {item.quantity} - £
+                      {item.quantity * item.price}
+                    </Text>
+                  </Box>
+                );
+              })}
+            </Box>
+            <Text bold>Total Amount: {calculatePrice(cartItems)}</Text>
+          </Box>
           <form
             style={{
               display: "inlineBlock",
@@ -56,8 +90,6 @@ class CheckOut extends React.Component {
             }}
             onSubmit={this.handleConfirmOrder}
           >
-            <Heading color="midnight">Checkout</Heading>
-
             <TextField
               id="address"
               type="text"
