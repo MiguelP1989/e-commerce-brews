@@ -50,7 +50,7 @@ class SignUp extends React.Component {
       //redirect users to home page
     } catch (err) {
       this.setState({ loading: false });
-      this.showToast();
+      this.showToast(err.message);
       //set loading
       //show erros message
     }

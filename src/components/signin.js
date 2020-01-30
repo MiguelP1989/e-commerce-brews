@@ -42,16 +42,9 @@ class SignIn extends React.Component {
       setToken(response.jwt);
       console.log("response", response);
       this.redirectUser("/");
-      // set loading = true
-      //make request to register user with Strapi
-      //set loading to false
-      //put token(to manage user session) in local localStorage
-      //redirect users to home page
     } catch (err) {
       this.setState({ loading: false });
-      this.showToast();
-      //set loading
-      //show erros message
+      this.showToast(err.message);
     }
   };
 
