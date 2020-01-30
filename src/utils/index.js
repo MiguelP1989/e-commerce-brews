@@ -19,6 +19,12 @@ export const getCart = (cartKey = CART_KEY) => {
   return [];
 };
 
+export const clearCart = (cartKey = CART_KEY) => {
+  if (localStorage) {
+    localStorage.removeItem(cartKey);
+  }
+};
+
 ///       /////////      ///////////
 
 const TOKEN_KEY = "token";
@@ -34,4 +40,12 @@ export const getToken = (tokenkey = TOKEN_KEY) => {
     return JSON.parse(localStorage.getItem(tokenkey));
   }
   return null;
+};
+
+// ///////
+
+export const clearToken = (tokenkey = TOKEN_KEY) => {
+  if (localStorage) {
+    localStorage.removeItem(tokenkey);
+  }
 };
