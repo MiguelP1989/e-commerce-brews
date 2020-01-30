@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 
 import { Container, Box, Heading, Text, Button, TextField } from "gestalt";
 import ToastMessage from "./toastmessage";
+import { setToken } from "../utils";
+
+import Strapi from "strapi-sdk-javascript/build/main";
+const apiUrl = process.env.API_URL || "http://localhost:1337";
+console.log(apiUrl);
+const strapi = new Strapi(apiUrl);
 
 class SignIn extends React.Component {
   state = {
@@ -19,27 +25,40 @@ class SignIn extends React.Component {
     this.setState({ [event.target.name]: value });
   };
 
-  handleSubmit = event => {
+  handleSubmit = async event => {
     event.preventDefault();
+    const { username, email, password } = this.state;
 
     if (this.isFormEmpty(this.state)) {
-      this.showToast("Fill all the fields");
+      this.showToast("Fill all the field");
       return;
     }
-    console.log("submit");
+    // console.log("submit");
 
     //Sign up user
     try {
-      this.setState({});
+      this.setState({ loading: true });
+      const response = await strapi.register(username, email, password);
+      this.setState({ loading: false });
+      setToken(response.jwt);
+      console.log("response", response);
+      this.redirectUser("/");
       // set loading = true
       //make request to register user with Strapi
       //set loading to false
       //put token(to manage user session) in local localStorage
       //redirect users to home page
     } catch (err) {
+      this.setState({ loading: false });
+      this.showToast();
       //set loading
       //show erros message
     }
+  };
+
+  redirectUser = path => {
+    // console.log(this.props);
+    this.props.history.push(path);
   };
 
   isFormEmpty = ({ username, email, password }) => {
@@ -52,7 +71,7 @@ class SignIn extends React.Component {
   };
 
   render() {
-    const { toastMessage, toast } = this.state;
+    const { toastMessage, toast, loading } = this.state;
     return (
       <Container>
         <Box
@@ -103,7 +122,12 @@ class SignIn extends React.Component {
               onChange={this.handleChange}
             />
 
-            <Button color="blue" text="submit" type="submit" />
+            <Button
+              disable={loading}
+              color="blue"
+              text="submit"
+              type="submit"
+            />
           </form>
         </Box>
         <ToastMessage show={toast} message={toastMessage} />
