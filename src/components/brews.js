@@ -13,7 +13,7 @@ import {
   IconButton
 } from "gestalt";
 import Loader from "./loader";
-import { calculatePrice } from "../utils";
+import { calculatePrice, setCart, getCart } from "../utils";
 
 import Strapi from "strapi-sdk-javascript/build/main";
 const apiUrl = process.env.API_URL || "http://localhost:1337";
@@ -54,7 +54,8 @@ class Brews extends React.Component {
       this.setState({
         brews: response.data.brand.brews,
         brand: response.data.brand.name,
-        loadingBrews: false
+        loadingBrews: false,
+        cartItems: getCart()
       });
     } catch (err) {
       console.log(err);
@@ -63,6 +64,7 @@ class Brews extends React.Component {
   }
 
   addToCart = brew => {
+    console.log(localStorage);
     const alreadyInCart = this.state.cartItems.findIndex(
       item => item._id === brew._id
     );
@@ -72,15 +74,21 @@ class Brews extends React.Component {
         ...brew,
         quantity: 1
       });
-      this.setState({
-        cartItems: updatedItems
-      });
+      this.setState(
+        {
+          cartItems: updatedItems
+        },
+        () => setCart(updatedItems)
+      );
     } else {
       const updatedItems = [...this.state.cartItems];
       updatedItems[alreadyInCart].quantity += 1;
-      this.setState({
-        cartItems: updatedItems
-      });
+      this.setState(
+        {
+          cartItems: updatedItems
+        },
+        () => setCart(updatedItems)
+      );
     }
   };
 
@@ -89,9 +97,12 @@ class Brews extends React.Component {
       item => item._id !== itemToBeDeletedId
     );
 
-    this.setState({
-      cartItems: filteredItems
-    });
+    this.setState(
+      {
+        cartItems: filteredItems
+      },
+      () => setCart(filteredItems)
+    );
   };
 
   render() {
