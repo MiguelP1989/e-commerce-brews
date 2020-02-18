@@ -1,9 +1,7 @@
 import React from "react";
-
 import { Container, Box, Text, Button, Modal, Spinner } from "gestalt";
 
 import { calculatePrice } from "../utils";
-
 const ConfirmationModal = ({
   orderProcessing,
   cartItems,

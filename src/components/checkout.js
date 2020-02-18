@@ -242,4 +242,5 @@ const CheckOut = () => {
     </StripeProvider>
   );
 };
+
 export default CheckOut;
